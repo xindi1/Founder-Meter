@@ -17,3 +17,9 @@ This version intentionally uses the Communication Meter backbone: same mobile-sa
 ## Deploy
 
 Upload all files to a static host such as GitHub Pages.
+
+
+## v1.1
+- Shortened primary button label from “Save Founder Thought” to “Save”.
+- Added mobile-safe action row styling to prevent button text overlap.
+- Bumped service worker cache.

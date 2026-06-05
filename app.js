@@ -1,7 +1,7 @@
 const STORAGE_KEY = "founder-meter-entries-v1";
 const THEME_KEY = "founder-meter-theme-v1";
 const EXPORT_KEY = "founder-meter-last-export-v1";
-const CACHE_BUST = "founder-meter-v2026-06-05-comm-backbone1";
+const CACHE_BUST = "founder-meter-v2026-06-05-comm-backbone2";
 
 const meters = ["Build", "Revenue", "Marketing", "Customer", "Strategy"];
 
