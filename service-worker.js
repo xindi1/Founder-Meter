@@ -1,4 +1,4 @@
-const CACHE_NAME = "founder-meter-v2026-06-05-comm-backbone2";
+const CACHE_NAME = "founder-meter-behavior-v2026-06-05-1";
 const ASSETS = [
   "./",
   "./index.html",

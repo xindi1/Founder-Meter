@@ -1,25 +1,28 @@
-# Founder Meter
+# Founder Meter — Behavioral Model
 
-Communication Meter-style founder attention meter.
+Mobile-first PWA for tracking repeatable founder behaviors.
 
-## What it measures
+## Pillars
 
 - Build
-- Revenue
-- Marketing
-- Customer
-- Strategy
+- Research
+- Organize
+- Share
+- Validate
+- Monetize
 
-## Why this version exists
+## Design principle
 
-This version intentionally uses the Communication Meter backbone: same mobile-safe shell, local timezone handling, today panel, fast logging, breakdown bars, stream, dark/light mode, JSON export/import, and PWA service worker.
+This is not a startup CRM. It is a behavioral meter: boring, repeatable, fast, and useful as a daily data stream.
 
 ## Deploy
 
-Upload all files to a static host such as GitHub Pages.
+Upload all files to GitHub Pages or another static host.
 
+## Install
 
-## v1.1
-- Shortened primary button label from “Save Founder Thought” to “Save”.
-- Added mobile-safe action row styling to prevent button text overlap.
-- Bumped service worker cache.
+Open the deployed URL on iPhone Safari, tap Share, then Add to Home Screen.
+
+## Data
+
+Entries are stored locally in the browser via localStorage. Use Export JSON / Import JSON for portability.

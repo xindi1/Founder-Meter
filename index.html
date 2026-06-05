@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1f6f8b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Founder Meter" />
   <title>Founder Meter</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -11,12 +13,13 @@
 </head>
 <body>
   <div class="safe-top-shield" aria-hidden="true"></div>
+
   <div class="app-shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">AI-first Startup Module</p>
+        <p class="eyebrow">Founder Behavior Meter</p>
         <h1>Founder Meter</h1>
-        <p class="subhead">Measure founder attention, bottlenecks, and commercialization pressure without turning every idea into a project-management task.</p>
+        <p class="subhead">Track repeatable founder behaviors: build, research, organize, share, validate, and monetize.</p>
       </div>
       <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme">☼</button>
     </header>
@@ -29,20 +32,20 @@
             <h2 id="localDateLabel">—</h2>
             <p id="timezoneLabel" class="muted">Local timezone</p>
           </div>
-          <div class="battery-ring" aria-label="Founder focus balance">
-            <strong id="balanceValue">100%</strong>
-            <span>balance</span>
+          <div class="battery-ring" aria-label="Founder behavior coverage">
+            <strong id="coverageValue">0%</strong>
+            <span>coverage</span>
           </div>
         </div>
 
         <div class="metric-grid">
           <article class="metric-card">
-            <span>Entries</span>
+            <span>Actions</span>
             <strong id="todayCount">0</strong>
           </article>
           <article class="metric-card">
-            <span>Pressure</span>
-            <strong id="todayPressure">0</strong>
+            <span>Effort</span>
+            <strong id="todayEffort">0</strong>
           </article>
           <article class="metric-card">
             <span>Dominant</span>
@@ -57,71 +60,74 @@
         <div class="threshold-line">
           <div class="threshold-copy">
             <strong id="thresholdStatus">Quiet</strong>
-            <span id="thresholdNote">Founder attention is currently light.</span>
+            <span id="thresholdNote">No founder behavior logged yet today.</span>
           </div>
-          <div class="meter-track"><div id="pressureBar" class="meter-fill"></div></div>
+          <div class="meter-track"><div id="effortBar" class="meter-fill"></div></div>
         </div>
       </section>
 
       <section class="panel quick-panel">
         <div class="section-heading">
-          <h2>Quick Capture</h2>
-          <p>Capture the founder thought. The meter will classify the pressure.</p>
+          <h2>Quick Log</h2>
+          <p>Capture the action, not the whole story.</p>
         </div>
 
         <form id="entryForm" class="entry-form">
           <input type="hidden" id="entryId" />
 
           <label class="field">
-            <span>Thought</span>
-            <textarea id="thought" placeholder="Example: Communication Meter could be licensed to therapists..." required></textarea>
+            <span>Behavior</span>
+            <select id="behavior">
+              <option>Build</option>
+              <option>Research</option>
+              <option>Organize</option>
+              <option>Share</option>
+              <option>Validate</option>
+              <option>Monetize</option>
+            </select>
           </label>
 
-          <div class="chip-group founder-chips" role="group" aria-label="Primary meter">
-            <button type="button" data-meter="Auto" class="chip selected">Auto</button>
-            <button type="button" data-meter="Build" class="chip">Build</button>
-            <button type="button" data-meter="Revenue" class="chip">Revenue</button>
-            <button type="button" data-meter="Marketing" class="chip">Marketing</button>
-            <button type="button" data-meter="Customer" class="chip">Customer</button>
-            <button type="button" data-meter="Strategy" class="chip">Strategy</button>
-          </div>
+          <label class="field">
+            <span>Asset / Product</span>
+            <input id="asset" type="text" list="assetList" placeholder="Founder Meter, Executive OS, Helio Clock..." />
+            <datalist id="assetList">
+              <option value="Executive OS"></option>
+              <option value="Founder Meter"></option>
+              <option value="FounderOS"></option>
+              <option value="Life Vitals"></option>
+              <option value="Communication Meter"></option>
+              <option value="Movement Meter"></option>
+              <option value="Nutrition Meter"></option>
+              <option value="Sleep Meter"></option>
+              <option value="Travel Meter"></option>
+              <option value="Need Log"></option>
+              <option value="Helio Clock"></option>
+              <option value="Trading Tools"></option>
+            </datalist>
+          </label>
 
           <div class="form-grid">
             <label class="field">
-              <span>Product / Opportunity</span>
-              <input id="product" type="text" list="productList" placeholder="Executive OS, Founder Meter, Helio Clock..." />
-              <datalist id="productList">
-                <option value="Executive OS"></option>
-                <option value="Founder Meter"></option>
-                <option value="Life Vitals"></option>
-                <option value="Communication Meter"></option>
-                <option value="Helio Clock"></option>
-                <option value="Narrative Journal"></option>
-                <option value="Need Log"></option>
-                <option value="Trading Tools"></option>
-              </datalist>
-            </label>
-
-            <label class="field">
-              <span>Intensity</span>
-              <select id="intensity">
-                <option value="1">1 · Light</option>
-                <option value="2">2 · Relevant</option>
-                <option value="3" selected>3 · Meaningful</option>
-                <option value="4">4 · Important</option>
-                <option value="5">5 · Urgent</option>
+              <span>Effort</span>
+              <select id="effort">
+                <option value="1">1 · Touch</option>
+                <option value="2">2 · Light</option>
+                <option value="3" selected>3 · Solid</option>
+                <option value="4">4 · Deep</option>
+                <option value="5">5 · Major</option>
               </select>
             </label>
 
             <label class="field">
-              <span>Convert to</span>
-              <select id="convertTo">
-                <option>Entry only</option>
-                <option>Task</option>
-                <option>Experiment</option>
-                <option>Opportunity</option>
-                <option>Revenue path</option>
-                <option>Marketing asset</option>
+              <span>Output</span>
+              <select id="output">
+                <option>Logged action</option>
+                <option>Code / build</option>
+                <option>Decision</option>
+                <option>Insight</option>
+                <option>Public artifact</option>
+                <option>Feedback</option>
+                <option>Revenue step</option>
               </select>
             </label>
 
@@ -135,6 +141,14 @@
               <input id="time" type="time" />
             </label>
           </div>
+
+          <details class="optional-details">
+            <summary>Optional note</summary>
+            <label class="field">
+              <span>Short note</span>
+              <input id="note" type="text" maxlength="180" placeholder="Only if useful." />
+            </label>
+          </details>
 
           <div class="actions">
             <button class="primary-btn" type="submit">Save</button>
@@ -153,10 +167,18 @@
 
       <section class="panel">
         <div class="section-heading">
-          <h2>Founder Breakdown</h2>
-          <p>Where today’s attention is actually going.</p>
+          <h2>Behavior Breakdown</h2>
+          <p>What founder behaviors occurred today.</p>
         </div>
-        <div id="meterBreakdown" class="bar-list"></div>
+        <div id="behaviorBreakdown" class="bar-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <h2>Asset Breakdown</h2>
+          <p>Which products are receiving founder attention.</p>
+        </div>
+        <div id="assetBreakdown" class="bar-list"></div>
       </section>
 
       <section class="panel">

@@ -1,7 +1,7 @@
 {
   "name": "Founder Meter",
   "short_name": "Founder Meter",
-  "description": "A low-friction founder attention meter for tracking build, revenue, marketing, customer, and strategy pressure.",
+  "description": "A low-friction mobile-first PWA for tracking repeatable founder behaviors.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eef6f7",

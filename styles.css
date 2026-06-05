@@ -1,6 +1,6 @@
 :root {
   --bg: #eef6f7;
-  --panel: rgba(255, 255, 255, 0.9);
+  --panel: rgba(255, 255, 255, 0.91);
   --text: #10252e;
   --muted: #60757d;
   --line: rgba(31, 111, 139, 0.18);
@@ -121,7 +121,7 @@ h3 { margin-bottom: 10px; font-size: 0.9rem; color: var(--muted); }
 .battery-ring strong { display: block; font-size: 1.25rem; }
 .battery-ring span { display: block; font-size: 0.68rem; color: var(--muted); margin-top: -18px; }
 
-.metric-grid, .form-grid, .preset-grid, .breakdown-grid {
+.metric-grid, .form-grid, .preset-grid {
   display: grid;
   gap: 10px;
 }
@@ -134,6 +134,7 @@ h3 { margin-bottom: 10px; font-size: 0.9rem; color: var(--muted); }
 }
 .metric-card span { display: block; color: var(--muted); font-size: 0.78rem; margin-bottom: 5px; }
 .metric-card strong { font-size: 1.45rem; letter-spacing: -0.04em; }
+.metric-card strong#todayDominant { font-size: 1.05rem; line-height: 1.15; }
 
 .threshold-line { margin-top: 15px; display: grid; gap: 10px; }
 .threshold-copy { display: flex; flex-direction: column; gap: 2px; }
@@ -171,13 +172,6 @@ input[type="date"], input[type="time"] {
 }
 input[type="date"] { padding-right: 10px; }
 
-.chip-group {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  overflow: visible;
-  padding-bottom: 0;
-}
 .chip, .preset-btn, .primary-btn, .secondary-btn, .danger-btn, .icon-btn, .ghost-btn {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -188,11 +182,7 @@ input[type="date"] { padding-right: 10px; }
   white-space: nowrap;
   min-width: 0;
 }
-
-.chip-group .chip { width: 100%; text-align: center; }
-.chip-group .chip[data-channel="Group Chat"] { grid-column: 1 / -1; }
-
-.chip.selected, .primary-btn { background: var(--accent); color: white; border-color: transparent; }
+.primary-btn { background: var(--accent); color: white; border-color: transparent; }
 .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; }
 .secondary-btn { background: transparent; }
 .danger-btn { background: transparent; color: var(--danger); border-color: rgba(165, 72, 61, 0.35); }
@@ -200,6 +190,11 @@ input[type="date"] { padding-right: 10px; }
 .danger-text { background: transparent; border: 0; color: var(--danger); font-weight: 800; font-size: 0.82rem; padding: 7px 4px; }
 
 .actions { display: flex; gap: 10px; }
+.quick-panel .actions {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 10px;
+}
 .actions > * { flex: 1; text-align: center; justify-content: center; }
 .wrap { flex-wrap: wrap; }
 .optional-details summary { color: var(--muted); font-weight: 750; padding: 4px 0; }
@@ -210,7 +205,6 @@ input[type="date"] { padding-right: 10px; }
 .preset-btn strong { font-size: 0.95rem; }
 .preset-btn span { color: var(--muted); font-size: 0.78rem; }
 
-.breakdown-grid { grid-template-columns: 1fr; }
 .bar-list { display: grid; gap: 9px; }
 .bar-row { display: grid; gap: 5px; }
 .bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: 0.88rem; }
@@ -242,53 +236,17 @@ body.dark .entry-card { background: rgba(255,255,255,0.04); }
   font-size: 0.9rem;
 }
 
-@media (min-width: 720px) {
-  .app-shell { padding-left: 22px; padding-right: 22px; }
-  .metric-grid { grid-template-columns: repeat(4, 1fr); }
-  .preset-grid { grid-template-columns: repeat(4, 1fr); }
-  .breakdown-grid { grid-template-columns: 1fr 1fr; }
-  .panel { padding: 20px; }
-}
-
-@media (max-width: 540px) {
-  .hero { padding-top: 0; }
-  .today-panel { margin-top: 0; }
-  .date-field { grid-column: 1 / -1; }
-}
-
-@media (max-width: 390px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .actions { flex-direction: column; }
-  .today-top { align-items: center; }
-  .battery-ring { width: 82px; height: 82px; border-width: 7px; }
-}
-
-
-@media (min-width: 430px) {
-  .chip-group { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .chip-group .chip[data-channel="Group Chat"] { grid-column: auto; }
-}
-
-@media (max-width: 390px) {
-  .app-shell { padding-left: 12px; padding-right: 12px; }
-  .panel { padding: 14px; }
-  .chip, .preset-btn, .primary-btn, .secondary-btn, .danger-btn { font-size: 0.95rem; }
-}
-
-/* Data module: mobile-safe export/import controls */
 .data-panel .actions {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
 }
-
 .data-panel .actions > * {
   width: 100%;
   min-width: 0;
   text-align: center;
   justify-content: center;
 }
-
 .data-panel .secondary-btn,
 .data-panel .danger-btn,
 .data-panel .import-label {
@@ -297,105 +255,48 @@ body.dark .entry-card { background: rgba(255,255,255,0.04); }
   justify-content: center;
   white-space: nowrap;
 }
-
 .small-note {
   margin: 14px 0 0;
   font-weight: 750;
 }
 
+.bar-row[data-behavior="Build"] .bar-fill,
+.entry-card[data-behavior="Build"] .score-pill { background: #1f6f8b; color: white; }
+.bar-row[data-behavior="Research"] .bar-fill,
+.entry-card[data-behavior="Research"] .score-pill { background: #5b6ee1; color: white; }
+.bar-row[data-behavior="Organize"] .bar-fill,
+.entry-card[data-behavior="Organize"] .score-pill { background: #9b49d6; color: white; }
+.bar-row[data-behavior="Share"] .bar-fill,
+.entry-card[data-behavior="Share"] .score-pill { background: #f27a1a; color: white; }
+.bar-row[data-behavior="Validate"] .bar-fill,
+.entry-card[data-behavior="Validate"] .score-pill { background: #1a9b55; color: white; }
+.bar-row[data-behavior="Monetize"] .bar-fill,
+.entry-card[data-behavior="Monetize"] .score-pill { background: #d63384; color: white; }
+
+@media (min-width: 720px) {
+  .app-shell { padding-left: 22px; padding-right: 22px; }
+  .metric-grid { grid-template-columns: repeat(4, 1fr); }
+  .preset-grid { grid-template-columns: repeat(4, 1fr); }
+  .panel { padding: 20px; }
+}
 @media (min-width: 640px) {
   .data-panel .actions {
     display: flex;
     flex-wrap: wrap;
   }
-
-  .data-panel .actions > * {
-    width: auto;
-  }
+  .data-panel .actions > * { width: auto; }
 }
-
-
-/* Founder Meter additions */
-textarea {
-  width: 100%;
-  max-width: 100%;
-  min-height: 112px;
-  resize: vertical;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  padding: 13px 12px;
-  background: rgba(255,255,255,0.7);
-  color: var(--text);
-  outline: none;
-  font: inherit;
-  line-height: 1.4;
+@media (max-width: 540px) {
+  .hero { padding-top: 0; }
+  .today-panel { margin-top: 0; }
+  .date-field { grid-column: 1 / -1; }
 }
-body.dark textarea { background: rgba(255,255,255,0.06); }
-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-2); }
-
-.founder-chips {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.founder-chips .chip[data-meter="Auto"] {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 560px) {
-  .founder-chips {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .founder-chips .chip[data-meter="Auto"] {
-    grid-column: auto;
-  }
-}
-
-.metric-card strong#todayDominant {
-  font-size: 1.05rem;
-  line-height: 1.15;
-}
-
-.entry-card[data-primary="Build"] .score-pill,
-.bar-row[data-meter="Build"] .bar-fill { background: #1f6f8b; color: white; }
-
-.entry-card[data-primary="Revenue"] .score-pill,
-.bar-row[data-meter="Revenue"] .bar-fill { background: #1a9b55; color: white; }
-
-.entry-card[data-primary="Marketing"] .score-pill,
-.bar-row[data-meter="Marketing"] .bar-fill { background: #9b49d6; color: white; }
-
-.entry-card[data-primary="Customer"] .score-pill,
-.bar-row[data-meter="Customer"] .bar-fill { background: #f27a1a; color: white; }
-
-.entry-card[data-primary="Strategy"] .score-pill,
-.bar-row[data-meter="Strategy"] .bar-fill { background: #d63384; color: white; }
-
-
-/* v1.1: Mobile-safe primary action row */
-.quick-panel .actions {
-  display: grid;
-  grid-template-columns: 1fr 0.85fr;
-  gap: 10px;
-  align-items: stretch;
-}
-
-.quick-panel .primary-btn,
-.quick-panel .secondary-btn {
-  width: 100%;
-  min-width: 0;
-  padding-left: 12px;
-  padding-right: 12px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.quick-panel .primary-btn {
-  white-space: nowrap;
-}
-
-@media (max-width: 380px) {
-  .quick-panel .actions {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 390px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .quick-panel .actions { grid-template-columns: 1fr; }
+  .today-top { align-items: center; }
+  .battery-ring { width: 82px; height: 82px; border-width: 7px; }
+  .app-shell { padding-left: 12px; padding-right: 12px; }
+  .panel { padding: 14px; }
+  .primary-btn, .secondary-btn, .danger-btn, .preset-btn { font-size: 0.95rem; }
 }

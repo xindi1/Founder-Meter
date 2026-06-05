@@ -1,47 +1,43 @@
-const STORAGE_KEY = "founder-meter-entries-v1";
-const THEME_KEY = "founder-meter-theme-v1";
-const EXPORT_KEY = "founder-meter-last-export-v1";
-const CACHE_BUST = "founder-meter-v2026-06-05-comm-backbone2";
+const STORAGE_KEY = "founder-meter-behavior-entries-v1";
+const THEME_KEY = "founder-meter-behavior-theme-v1";
+const EXPORT_KEY = "founder-meter-behavior-last-export-v1";
+const CACHE_BUST = "founder-meter-behavior-v2026-06-05-1";
 
-const meters = ["Build", "Revenue", "Marketing", "Customer", "Strategy"];
-
-const meterMeta = {
-  Build: { words: /build|bug|fix|feature|app|code|pwa|deploy|zip|github|ui|ux|spacing|version|update|prototype/i },
-  Revenue: { words: /revenue|money|monetiz|price|pricing|subscription|license|licensing|sell|sales|commercial|marketplace|paid|profit/i },
-  Marketing: { words: /marketing|post|launch|linkedin|video|demo|screenshot|content|brand|audience|visibility|landing page|copy/i },
-  Customer: { words: /customer|user|persona|feedback|interview|therapist|founder|buyer|client|validation|market/i },
-  Strategy: { words: /strategy|thesis|opportunity|positioning|flagship|roadmap|pathway|agent|framework|priority|focus/i }
-};
+const behaviors = ["Build", "Research", "Organize", "Share", "Validate", "Monetize"];
 
 const presets = [
-  { thought: "Fix or improve the current app experience.", meters: ["Build"], intensity: 3, product: "Founder Meter", label: "Build Fix", sub: "product work" },
-  { thought: "Define or test a revenue path.", meters: ["Revenue", "Strategy"], intensity: 3, product: "Executive OS", label: "Revenue Path", sub: "money work" },
-  { thought: "Create a proof-of-use screenshot, demo, or post.", meters: ["Marketing"], intensity: 2, product: "Executive OS", label: "Marketing Proof", sub: "visibility" },
-  { thought: "Collect feedback from a potential user or buyer.", meters: ["Customer"], intensity: 3, product: "Communication Meter", label: "Customer Signal", sub: "validation" }
+  { behavior: "Build", asset: "Founder Meter", effort: 3, output: "Code / build", note: "Built or updated a product.", label: "Build", sub: "product work" },
+  { behavior: "Research", asset: "Executive OS", effort: 2, output: "Insight", note: "Explored a market, tool, customer, or commercialization path.", label: "Research", sub: "learn" },
+  { behavior: "Organize", asset: "Executive OS", effort: 2, output: "Decision", note: "Structured assets, priorities, or next actions.", label: "Organize", sub: "structure" },
+  { behavior: "Share", asset: "Executive OS", effort: 2, output: "Public artifact", note: "Created or shared proof-of-use, demo, post, or screenshot.", label: "Share", sub: "visibility" },
+  { behavior: "Validate", asset: "Communication Meter", effort: 3, output: "Feedback", note: "Got feedback or reality contact from a user, buyer, or market.", label: "Validate", sub: "reality" },
+  { behavior: "Monetize", asset: "Executive OS", effort: 3, output: "Revenue step", note: "Worked on pricing, licensing, selling, or a revenue path.", label: "Monetize", sub: "money" }
 ];
 
 const els = {
   localDateLabel: document.getElementById("localDateLabel"),
   timezoneLabel: document.getElementById("timezoneLabel"),
-  balanceValue: document.getElementById("balanceValue"),
+  coverageValue: document.getElementById("coverageValue"),
   todayCount: document.getElementById("todayCount"),
-  todayPressure: document.getElementById("todayPressure"),
+  todayEffort: document.getElementById("todayEffort"),
   todayDominant: document.getElementById("todayDominant"),
   todayDensity: document.getElementById("todayDensity"),
   thresholdStatus: document.getElementById("thresholdStatus"),
   thresholdNote: document.getElementById("thresholdNote"),
-  pressureBar: document.getElementById("pressureBar"),
+  effortBar: document.getElementById("effortBar"),
   form: document.getElementById("entryForm"),
   entryId: document.getElementById("entryId"),
-  thought: document.getElementById("thought"),
-  product: document.getElementById("product"),
-  intensity: document.getElementById("intensity"),
-  convertTo: document.getElementById("convertTo"),
+  behavior: document.getElementById("behavior"),
+  asset: document.getElementById("asset"),
+  effort: document.getElementById("effort"),
+  output: document.getElementById("output"),
   date: document.getElementById("date"),
   time: document.getElementById("time"),
+  note: document.getElementById("note"),
   resetBtn: document.getElementById("resetBtn"),
   presetGrid: document.getElementById("presetGrid"),
-  meterBreakdown: document.getElementById("meterBreakdown"),
+  behaviorBreakdown: document.getElementById("behaviorBreakdown"),
+  assetBreakdown: document.getElementById("assetBreakdown"),
   dateFilter: document.getElementById("dateFilter"),
   entriesList: document.getElementById("entriesList"),
   entryTemplate: document.getElementById("entryTemplate"),
@@ -54,7 +50,6 @@ const els = {
 };
 
 let entries = loadEntries();
-let selectedMeter = "Auto";
 
 initialize();
 
@@ -64,10 +59,6 @@ function initialize() {
   renderPresets();
   renderLastExport();
   renderAll();
-
-  document.querySelectorAll("[data-meter]").forEach((button) => {
-    button.addEventListener("click", () => setMeter(button.dataset.meter));
-  });
 
   els.form.addEventListener("submit", handleSubmit);
   els.resetBtn.addEventListener("click", resetForm);
@@ -143,40 +134,22 @@ function setDateTimeDefault() {
   els.time.value = toLocalTime(now);
 }
 
-function setMeter(meter) {
-  selectedMeter = meter;
-  document.querySelectorAll("[data-meter]").forEach((button) => {
-    button.classList.toggle("selected", button.dataset.meter === meter);
-  });
-}
-
-function classifyThought(text, forced = selectedMeter) {
-  if (forced && forced !== "Auto") return [forced];
-
-  const found = meters.filter((meter) => meterMeta[meter].words.test(text || ""));
-  if (!found.length) return ["Strategy"];
-  return found;
-}
-
 function createEntry(overrides = {}) {
   const now = new Date();
-  const text = (overrides.thought ?? els.thought.value).trim();
+  const behavior = overrides.behavior || els.behavior.value;
   const dateKey = overrides.dateKey || els.date.value || nowLocalDateKey();
   const time = overrides.time || els.time.value || toLocalTime(now);
-  const intensity = Number(overrides.intensity ?? els.intensity.value);
-  const meterList = overrides.meters || classifyThought(text);
+  const effort = Number(overrides.effort ?? els.effort.value);
 
   return {
     id: overrides.id || crypto.randomUUID(),
     dateKey,
     time,
-    thought: text,
-    product: (overrides.product ?? els.product.value).trim() || "Unassigned",
-    meters: meterList,
-    primaryMeter: meterList[0] || "Strategy",
-    intensity,
-    convertTo: overrides.convertTo || els.convertTo.value,
-    pressure: intensity * Math.max(1, meterList.length),
+    behavior,
+    asset: (overrides.asset ?? els.asset.value).trim() || "Unassigned",
+    effort,
+    output: overrides.output || els.output.value,
+    note: (overrides.note ?? els.note.value).trim(),
     createdAt: overrides.createdAt || now.toISOString(),
     updatedAt: now.toISOString(),
     localTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Local"
@@ -191,10 +164,10 @@ function handleSubmit(event) {
 
   if (existingId) {
     entries = entries.map((item) => item.id === existingId ? entry : item);
-    showToast("Founder thought updated.");
+    showToast("Founder action updated.");
   } else {
     entries.unshift(entry);
-    showToast("Founder thought saved.");
+    showToast("Founder action saved.");
   }
   saveEntries();
   resetForm();
@@ -212,7 +185,6 @@ function addPreset(preset) {
 function resetForm() {
   els.form.reset();
   els.entryId.value = "";
-  setMeter("Auto");
   setDateTimeDefault();
 }
 
@@ -230,19 +202,23 @@ function getTodayEntries() {
 function summarize(list) {
   return list.reduce((acc, entry) => {
     acc.count += 1;
-    acc.pressure += Number(entry.pressure || 0);
-    (entry.meters || [entry.primaryMeter || "Strategy"]).forEach((meter) => {
-      if (!acc.byMeter[meter]) acc.byMeter[meter] = { label: meter, count: 0, pressure: 0 };
-      acc.byMeter[meter].count += 1;
-      acc.byMeter[meter].pressure += Number(entry.intensity || 1);
-    });
+    acc.effort += Number(entry.effort || 0);
+    const behavior = entry.behavior || "Build";
+    if (!acc.byBehavior[behavior]) acc.byBehavior[behavior] = { label: behavior, count: 0, effort: 0 };
+    acc.byBehavior[behavior].count += 1;
+    acc.byBehavior[behavior].effort += Number(entry.effort || 0);
+
+    const asset = entry.asset || "Unassigned";
+    if (!acc.byAsset[asset]) acc.byAsset[asset] = { label: asset, count: 0, effort: 0 };
+    acc.byAsset[asset].count += 1;
+    acc.byAsset[asset].effort += Number(entry.effort || 0);
     return acc;
-  }, { count: 0, pressure: 0, byMeter: {} });
+  }, { count: 0, effort: 0, byBehavior: {}, byAsset: {} });
 }
 
 function renderAll() {
   renderToday();
-  renderBreakdown();
+  renderBreakdowns();
   renderEntries();
 }
 
@@ -250,21 +226,21 @@ function renderToday() {
   const todayKey = nowLocalDateKey();
   const today = getTodayEntries();
   const totals = summarize(today);
-  const rows = Object.values(totals.byMeter);
+  const rows = Object.values(totals.byBehavior);
   const hoursElapsed = Math.max(1, (new Date().getHours() + new Date().getMinutes() / 60));
   const density = totals.count / hoursElapsed;
-  const dominant = rows.sort((a,b) => b.pressure - a.pressure)[0]?.label || "—";
-  const nonzero = rows.filter(r => r.count > 0).length;
-  const balance = Math.round((nonzero / meters.length) * 100);
+  const dominant = rows.sort((a, b) => b.effort - a.effort)[0]?.label || "—";
+  const nonzero = behaviors.filter((b) => (totals.byBehavior[b]?.count || 0) > 0).length;
+  const coverage = Math.round((nonzero / behaviors.length) * 100);
 
   els.localDateLabel.textContent = formatDateLabel(todayKey);
   els.timezoneLabel.textContent = `Day boundary uses this device’s local timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone || "Local"}`;
   els.todayCount.textContent = totals.count;
-  els.todayPressure.textContent = Math.round(totals.pressure);
+  els.todayEffort.textContent = Math.round(totals.effort);
   els.todayDominant.textContent = dominant;
   els.todayDensity.textContent = `${density.toFixed(1)}/hr`;
-  els.balanceValue.textContent = `${balance}%`;
-  els.pressureBar.style.width = `${Math.min(100, totals.pressure * 4)}%`;
+  els.coverageValue.textContent = `${coverage}%`;
+  els.effortBar.style.width = `${Math.min(100, totals.effort * 5)}%`;
 
   const status = getThresholdStatus(totals, dominant, nonzero);
   els.thresholdStatus.textContent = status.title;
@@ -272,11 +248,11 @@ function renderToday() {
 }
 
 function getThresholdStatus(totals, dominant, nonzero) {
-  if (totals.count === 0) return { title: "Quiet", note: "No founder activity logged yet today." };
-  if (nonzero <= 2 && totals.count >= 5) return { title: "Narrow Band", note: `${dominant} is dominating. Check whether another founder channel needs attention.` };
-  if (totals.pressure >= 30) return { title: "High Pressure", note: "Founder attention is highly active. Convert the strongest signal into one next action." };
-  if (nonzero >= 4) return { title: "Balanced", note: "Founder attention is spread across several channels today." };
-  return { title: "Active", note: "Founder activity is present. Watch for Build-heavy drift." };
+  if (totals.count === 0) return { title: "Quiet", note: "No founder behavior logged yet today." };
+  if (nonzero === 1 && totals.count >= 3) return { title: "Narrow", note: `${dominant} is dominating. That may be fine, but check whether another behavior needs a small touch.` };
+  if (totals.effort >= 25) return { title: "High Activity", note: "Founder behavior is highly active today. Convert one strong thread into a concrete next step." };
+  if (nonzero >= 4) return { title: "Balanced", note: "Multiple founder behaviors are represented today." };
+  return { title: "Active", note: "Founder behavior is present. Keep logging the boring repeatable actions." };
 }
 
 function renderPresets() {
@@ -291,23 +267,26 @@ function renderPresets() {
   });
 }
 
-function renderBreakdown() {
+function renderBreakdowns() {
   const today = getTodayEntries();
   const totals = summarize(today);
-  const rows = meters.map((meter) => totals.byMeter[meter] || { label: meter, count: 0, pressure: 0 });
-  renderBarList(els.meterBreakdown, rows);
+  const behaviorRows = behaviors.map((behavior) => totals.byBehavior[behavior] || { label: behavior, count: 0, effort: 0 });
+  renderBarList(els.behaviorBreakdown, behaviorRows, "behavior");
+
+  const assetRows = Object.values(totals.byAsset).sort((a, b) => b.effort - a.effort).slice(0, 8);
+  renderBarList(els.assetBreakdown, assetRows.length ? assetRows : [{ label: "No assets yet", count: 0, effort: 0 }], "asset");
 }
 
-function renderBarList(container, rows) {
+function renderBarList(container, rows, type) {
   container.innerHTML = "";
-  const max = Math.max(...rows.map((row) => row.pressure), 1);
+  const max = Math.max(...rows.map((row) => row.effort), 1);
   rows.forEach((row) => {
     const item = document.createElement("div");
     item.className = "bar-row";
-    item.dataset.meter = row.label;
+    if (type === "behavior") item.dataset.behavior = row.label;
     item.innerHTML = `
-      <div class="bar-top"><strong>${escapeHTML(row.label)}</strong><span>${row.count} · ${Math.round(row.pressure)} pressure</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${row.pressure ? Math.max(4, (row.pressure / max) * 100) : 0}%"></div></div>
+      <div class="bar-top"><strong>${escapeHTML(row.label)}</strong><span>${row.count} · ${Math.round(row.effort)} effort</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${row.effort ? Math.max(4, (row.effort / max) * 100) : 0}%"></div></div>
     `;
     container.appendChild(item);
   });
@@ -324,19 +303,19 @@ function renderEntries() {
   els.entryCountLabel.textContent = `${list.length} ${list.length === 1 ? "entry" : "entries"}${els.dateFilter.value === "all" ? "" : " shown"}`;
 
   if (!list.length) {
-    els.entriesList.innerHTML = `<div class="empty">No founder thoughts logged for this view.</div>`;
+    els.entriesList.innerHTML = `<div class="empty">No founder actions logged for this view.</div>`;
     return;
   }
 
   list.forEach((entry) => {
     const node = els.entryTemplate.content.firstElementChild.cloneNode(true);
-    node.dataset.primary = entry.primaryMeter || "Strategy";
-    node.querySelector(".entry-title").textContent = `${entry.product || "Unassigned"} · ${(entry.meters || []).join(" + ") || entry.primaryMeter || "Strategy"}`;
-    node.querySelector(".entry-meta").textContent = `${entry.dateKey} ${entry.time || ""} · ${entry.convertTo || "Entry only"} · intensity ${entry.intensity}`;
+    node.dataset.behavior = entry.behavior || "Build";
+    node.querySelector(".entry-title").textContent = `${entry.behavior} · ${entry.asset || "Unassigned"}`;
+    node.querySelector(".entry-meta").textContent = `${entry.dateKey} ${entry.time || ""} · ${entry.output || "Logged action"} · effort ${entry.effort}`;
     const note = node.querySelector(".entry-note");
-    note.textContent = entry.thought || "";
-    note.hidden = !entry.thought;
-    node.querySelector(".score-pill").textContent = Math.round(entry.pressure || 0);
+    note.textContent = entry.note || "";
+    note.hidden = !entry.note;
+    node.querySelector(".score-pill").textContent = Math.round(entry.effort || 0);
     node.querySelector(".edit-entry").addEventListener("click", () => editEntry(entry.id));
     node.querySelector(".duplicate-entry").addEventListener("click", () => duplicateEntry(entry.id));
     node.querySelector(".delete-entry").addEventListener("click", () => deleteEntry(entry.id));
@@ -348,13 +327,13 @@ function editEntry(id) {
   const entry = entries.find((item) => item.id === id);
   if (!entry) return;
   els.entryId.value = entry.id;
-  els.thought.value = entry.thought || "";
-  els.product.value = entry.product === "Unassigned" ? "" : entry.product || "";
-  setMeter(entry.primaryMeter || "Auto");
-  els.intensity.value = String(entry.intensity || 3);
-  els.convertTo.value = entry.convertTo || "Entry only";
+  els.behavior.value = entry.behavior || "Build";
+  els.asset.value = entry.asset === "Unassigned" ? "" : entry.asset || "";
+  els.effort.value = String(entry.effort || 3);
+  els.output.value = entry.output || "Logged action";
   els.date.value = entry.dateKey || nowLocalDateKey();
   els.time.value = entry.time || toLocalTime(new Date());
+  els.note.value = entry.note || "";
   document.querySelector(".quick-panel").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -365,25 +344,27 @@ function duplicateEntry(id) {
   entries.unshift(clone);
   saveEntries();
   renderAll();
-  showToast("Founder thought duplicated for today.");
+  showToast("Founder action duplicated for today.");
 }
 
 function deleteEntry(id) {
   entries = entries.filter((item) => item.id !== id);
   saveEntries();
   renderAll();
-  showToast("Founder thought deleted.");
+  showToast("Founder action deleted.");
 }
 
 function exportData() {
   const exportedAt = new Date().toISOString();
   const payload = {
     app: "Founder Meter",
+    model: "Behavioral",
     version: CACHE_BUST,
     exportedAt,
     localDateAtExport: nowLocalDateKey(),
     localTimeAtExport: toLocalTime(new Date()),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Local",
+    behaviors,
     entries
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -430,20 +411,15 @@ function importData(event) {
 }
 
 function normalizeImportedEntry(entry) {
-  const intensity = Number(entry.intensity || 3);
-  const thought = entry.thought || entry.note || "";
-  const meterList = Array.isArray(entry.meters) ? entry.meters : classifyThought(thought, entry.primaryMeter || "Auto");
   return {
     id: entry.id || crypto.randomUUID(),
     dateKey: entry.dateKey || nowLocalDateKey(),
     time: entry.time || "",
-    thought,
-    product: entry.product || "Unassigned",
-    meters: meterList,
-    primaryMeter: entry.primaryMeter || meterList[0] || "Strategy",
-    intensity,
-    convertTo: entry.convertTo || "Entry only",
-    pressure: Number(entry.pressure || intensity * Math.max(1, meterList.length)),
+    behavior: behaviors.includes(entry.behavior) ? entry.behavior : "Build",
+    asset: entry.asset || "Unassigned",
+    effort: Number(entry.effort || 1),
+    output: entry.output || "Logged action",
+    note: entry.note || "",
     createdAt: entry.createdAt || new Date().toISOString(),
     updatedAt: entry.updatedAt || new Date().toISOString(),
     localTimezone: entry.localTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Local"
